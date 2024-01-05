@@ -9,9 +9,28 @@
 package com.starlingever.leakguardian_core;
 
 
-public class InternalLeakGuardian implements OnActivityRetainedListener {
+import android.app.Application;
+
+import com.starlingever.objectobserver.GlobalObserver;
+import com.starlingever.objectobserver.ObjectObserver;
+import com.starlingever.objectobserver.OnObjectRetainedListener;
+
+public class InternalLeakGuardian implements OnObjectRetainedListener {
+    private HeapDumpTrigger heapDumpTrigger;
+
+    GlobalObserver globalObserver;
+
     @Override
     public void onObjectRetained() {
-
+        scheduleRetainedObjectCheck();
     }
+
+    private void scheduleRetainedObjectCheck() {
+        if (heapDumpTrigger != null) {
+            heapDumpTrigger.scheduleHandlePossibleRetainedObject();
+        } else {
+            throw new IllegalStateException("heapDumpTrigger is null");
+        }
+    }
+
 }

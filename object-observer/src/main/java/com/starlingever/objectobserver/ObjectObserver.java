@@ -21,20 +21,20 @@ import java.util.concurrent.Executor;
 
 public class ObjectObserver implements ReachabilityObserver {
 
-    private Executor checkRetainedExecutor;
+    private final Executor checkRetainedExecutor;
 
-    private boolean isEnabled = true;
+    private boolean isEnabled;
 
-    private ReferenceQueue<Object> queue;
+    private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
-    private final Set<String> observedObjectKeys;
+    private final Set<String> observedObjectKeys = new CopyOnWriteArraySet<>();
+
+    private final Set<OnObjectRetainedListener> onObjectRetainedListeners = new CopyOnWriteArraySet<>();
 
     @SuppressLint("RestrictedApi")
     public ObjectObserver(Executor checkRetainedExecutor, boolean isEnabled) {
-        this.checkRetainedExecutor = checkNotNull(checkRetainedExecutor, " 执行器");
+        this.checkRetainedExecutor = checkNotNull(checkRetainedExecutor, "线程延时执行器");
         this.isEnabled = isEnabled;
-        queue = new ReferenceQueue<>();
-        observedObjectKeys = new CopyOnWriteArraySet<>();
     }
 
     public void observe(Object observedObject) {
@@ -46,20 +46,31 @@ public class ObjectObserver implements ReachabilityObserver {
     public void observe(Object observedObject, String description) {
         checkNotNull(observedObject, "待观测对象");
         checkNotNull(description, "对象名称");
-        final long observeStartNanoTime = System.nanoTime();
+        // final long observeStartNanoTime = System.nanoTime();
         String key = UUID.randomUUID().toString();
         observedObjectKeys.add(key);
         final KeyedWeakReference keyedWeakReference = new KeyedWeakReference(observedObject, queue, key, description);
-        checkRetainedExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                moveToRetained(key);
-            }
-        });
-
+        checkRetainedExecutor.execute(() -> moveToRetained(keyedWeakReference));
     }
 
-    private void moveToRetained(String key) {
+    private void moveToRetained(KeyedWeakReference reference) {
         // 调用heapDump
+        removeWeaklyReachableReferences();
+        if (!exist(reference)) {
+            for (OnObjectRetainedListener onObjectRetainedListener : onObjectRetainedListeners) {
+                onObjectRetainedListener.onObjectRetained();
+            }
+        }
+    }
+
+    private boolean exist(KeyedWeakReference reference) {
+        return observedObjectKeys.contains(reference.key);
+    }
+
+    private void removeWeaklyReachableReferences() {
+        KeyedWeakReference ref;
+        while ((ref = (KeyedWeakReference) queue.poll()) != null) {
+            observedObjectKeys.remove(ref.key);
+        }
     }
 }

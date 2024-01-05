@@ -8,7 +8,9 @@
  */
 package com.starlingever.leakguardian_core;
 
-
+@Deprecated
 public interface OnActivityRetainedListener {
+
     void onObjectRetained();
+
 }
