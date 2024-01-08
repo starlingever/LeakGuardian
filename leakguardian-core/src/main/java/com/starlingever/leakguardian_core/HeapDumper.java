@@ -2,12 +2,16 @@
  * @Author：LingSida
  * @Package：com.starlingever.leakguardian_core
  * @Project：LeakGuardian
- * @name：GcTrigger
- * @Date：2024/1/3 15:09
- * @Filename：GcTrigger
+ * @name：HeapDumper
+ * @Date：2024/1/8 10:24
+ * @Filename：HeapDumper
  */
 package com.starlingever.leakguardian_core;
 
 
-public class GcTrigger {
+import java.io.File;
+
+public interface HeapDumper {
+
+    File dumpHeap();
 }

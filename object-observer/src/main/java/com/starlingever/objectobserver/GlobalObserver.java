@@ -31,6 +31,7 @@ public class GlobalObserver {
 
     @SuppressLint("RestrictedApi")
     public static void manuallyInstall(Application application, Long retainedDelayMillis) {
+        // Todo 需要在这个地方创建InternalLeakGuardian的单实例，并进行必要的初始化工作
         checkNotNull(objectObserver);
         List<InsatllableObserver> observersForInstall = appDefaultObservers(application, objectObserver);
         for (InsatllableObserver insatllableObserver : observersForInstall) {

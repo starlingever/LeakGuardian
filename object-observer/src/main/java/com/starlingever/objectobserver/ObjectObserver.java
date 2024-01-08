@@ -18,6 +18,8 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executor;
 
+import kotlin.jvm.Synchronized;
+
 
 public class ObjectObserver implements ReachabilityObserver {
 
@@ -25,16 +27,26 @@ public class ObjectObserver implements ReachabilityObserver {
 
     private boolean isEnabled;
 
+    private GcTrigger gcTrigger = GcTrigger.DEFAULT;
+
+    private int retainedObjectNum;
+
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
     private final Set<String> observedObjectKeys = new CopyOnWriteArraySet<>();
 
     private final Set<OnObjectRetainedListener> onObjectRetainedListeners = new CopyOnWriteArraySet<>();
 
+
     @SuppressLint("RestrictedApi")
     public ObjectObserver(Executor checkRetainedExecutor, boolean isEnabled) {
         this.checkRetainedExecutor = checkNotNull(checkRetainedExecutor, "线程延时执行器");
         this.isEnabled = isEnabled;
+    }
+
+    public int getRetainedObjectNum() {
+        removeWeaklyReachableReferences();
+        return observedObjectKeys.size();
     }
 
     public void observe(Object observedObject) {
@@ -55,7 +67,10 @@ public class ObjectObserver implements ReachabilityObserver {
 
     private void moveToRetained(KeyedWeakReference reference) {
         // 调用heapDump
+        // Todo 垃圾回收的执行地
         removeWeaklyReachableReferences();
+        // 显式的调用gc以增加准确率，也可以不调用
+        // gcTrigger.runGc();
         if (!exist(reference)) {
             for (OnObjectRetainedListener onObjectRetainedListener : onObjectRetainedListeners) {
                 onObjectRetainedListener.onObjectRetained();
@@ -72,5 +87,13 @@ public class ObjectObserver implements ReachabilityObserver {
         while ((ref = (KeyedWeakReference) queue.poll()) != null) {
             observedObjectKeys.remove(ref.key);
         }
+    }
+
+    synchronized void addOnObjectRetainedListener(OnObjectRetainedListener listener) {
+        onObjectRetainedListeners.add(listener);
+    }
+
+    synchronized void removeOnObjectRetainedListener(OnObjectRetainedListener listener) {
+        onObjectRetainedListeners.remove(listener);
     }
 }

@@ -18,7 +18,9 @@ import com.starlingever.objectobserver.OnObjectRetainedListener;
 public class InternalLeakGuardian implements OnObjectRetainedListener {
     private HeapDumpTrigger heapDumpTrigger;
 
-    GlobalObserver globalObserver;
+    private Application application;
+
+
 
     @Override
     public void onObjectRetained() {
@@ -27,7 +29,7 @@ public class InternalLeakGuardian implements OnObjectRetainedListener {
 
     private void scheduleRetainedObjectCheck() {
         if (heapDumpTrigger != null) {
-            heapDumpTrigger.scheduleHandlePossibleRetainedObject();
+            heapDumpTrigger.scheduleHandlePossibleRetainedObject(0L);
         } else {
             throw new IllegalStateException("heapDumpTrigger is null");
         }
