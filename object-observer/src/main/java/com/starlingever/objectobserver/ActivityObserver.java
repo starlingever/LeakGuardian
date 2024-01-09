@@ -42,7 +42,7 @@ public final class ActivityObserver implements InsatllableObserver {
 
     @Override
     public void install() {
-        Log.d(GlobalData.INIT, this.getClass().getName() + "is installed: ");
+        Log.d(GlobalData.INIT, this.getClass().getName() + " 监视器已经安装");
         application.registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacksAdapter() {
             @Override
             public void onActivityDestroyed(@NonNull Activity activity) {

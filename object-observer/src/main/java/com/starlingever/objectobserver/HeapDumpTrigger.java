@@ -6,7 +6,7 @@
  * @Date：2024/1/3 15:08
  * @Filename：HeapDumpTrigger
  */
-package com.starlingever.leakguardian_core;
+package com.starlingever.objectobserver;
 
 
 import android.app.Application;
@@ -15,8 +15,6 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.starlingever.objectobserver.GcTrigger;
-import com.starlingever.objectobserver.ObjectObserver;
 import com.starlingever.objectobserver.utils.GlobalData;
 
 import java.io.File;
@@ -37,15 +35,19 @@ public final class HeapDumpTrigger implements HeapDumper {
 
     private HeapDirectoryProvider heapDirectoryProvider;
 
-    public HeapDumpTrigger(Application application, Handler handler, GcTrigger gcTrigger, ObjectObserver objectObserver, HeapDirectoryProvider heapDirectoryProvider) {
+    private final HeapDump.Listener heapDumpListener;
+
+
+    public HeapDumpTrigger(Application application, Handler handler, GcTrigger gcTrigger, ObjectObserver objectObserver, HeapDirectoryProvider heapDirectoryProvider, HeapDump.Listener heapDumpListener) {
         this.application = application;
         this.backgroundHandler = handler;
         this.gcTrigger = gcTrigger;
         this.objectObserver = objectObserver;
         this.heapDirectoryProvider = heapDirectoryProvider;
+        this.heapDumpListener = heapDumpListener;
     }
 
-    void scheduleHandlePossibleRetainedObject(Long delayMillis) {
+    public void scheduleHandlePossibleRetainedObject(Long delayMillis) {
         Long checkCurrentTime = checkTime;
         if (checkCurrentTime > 0) {
             return; // 说明已经有相应的任务调度了
@@ -65,16 +67,14 @@ public final class HeapDumpTrigger implements HeapDumper {
         if (retainedObjectNum >= threshold) {
             Log.d(GlobalData.DUMP, "可以进行heapDump");
             File heapDumpFile = dumpHeap();
+            assert heapDumpFile != null;
+            long length = heapDumpFile.length();
+            Log.d(GlobalData.DUMP, "转存堆快照大小为" + length + "字节");
+            // Todo 另起一个独立进程进行heapDumpFile的分析，以后台服务的形式
+            HeapDump heapDump = new HeapDump(heapDumpFile, "", "");
+            heapDumpListener.analyze(heapDump);
         }
-        // 另起一个独立进程进行heapDumpFile的分析
 
-    }
-
-    void onDumpHeapListened() {
-
-    }
-
-    void checkPossibleRetainedObject() {
 
     }
 

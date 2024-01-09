@@ -6,7 +6,7 @@
  * @Date：2024/1/8 10:24
  * @Filename：HeapDumper
  */
-package com.starlingever.leakguardian_core;
+package com.starlingever.objectobserver;
 
 
 import java.io.File;

@@ -11,14 +11,15 @@ package com.starlingever.objectobserver;
 import static androidx.core.util.Preconditions.checkNotNull;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
+
+import com.starlingever.objectobserver.utils.GlobalData;
 
 import java.lang.ref.ReferenceQueue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executor;
-
-import kotlin.jvm.Synchronized;
 
 
 public class ObjectObserver implements ReachabilityObserver {
@@ -66,12 +67,11 @@ public class ObjectObserver implements ReachabilityObserver {
     }
 
     private void moveToRetained(KeyedWeakReference reference) {
-        // 调用heapDump
-        // Todo 垃圾回收的执行地
         removeWeaklyReachableReferences();
         // 显式的调用gc以增加准确率，也可以不调用
         // gcTrigger.runGc();
-        if (!exist(reference)) {
+        if (exist(reference)) {
+            Log.d(GlobalData.OBS, "监控到泄漏对象存在!");
             for (OnObjectRetainedListener onObjectRetainedListener : onObjectRetainedListeners) {
                 onObjectRetainedListener.onObjectRetained();
             }
@@ -89,11 +89,11 @@ public class ObjectObserver implements ReachabilityObserver {
         }
     }
 
-    synchronized void addOnObjectRetainedListener(OnObjectRetainedListener listener) {
+    public synchronized void addOnObjectRetainedListener(OnObjectRetainedListener listener) {
         onObjectRetainedListeners.add(listener);
     }
 
-    synchronized void removeOnObjectRetainedListener(OnObjectRetainedListener listener) {
+    public synchronized void removeOnObjectRetainedListener(OnObjectRetainedListener listener) {
         onObjectRetainedListeners.remove(listener);
     }
 }

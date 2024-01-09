@@ -6,7 +6,7 @@
  * @Date：2024/1/8 13:52
  * @Filename：HeapDirectoryProvider
  */
-package com.starlingever.leakguardian_core;
+package com.starlingever.objectobserver;
 
 
 import androidx.annotation.NonNull;

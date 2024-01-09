@@ -20,18 +20,23 @@ import java.util.List;
 import java.util.concurrent.Executor;
 
 public class GlobalObserver {
+    private static final Long retainedDelayMillis = 5000L;
     // Todo 未初始化
     private static final ObjectObserver objectObserver = new ObjectObserver(new Executor() {
         @Override
         public void execute(Runnable command) {
             Handler mainHandler = new Handler(Looper.getMainLooper());
-            mainHandler.postDelayed(command, 5000);
+            mainHandler.postDelayed(command, retainedDelayMillis);
         }
     }, true);
 
     @SuppressLint("RestrictedApi")
-    public static void manuallyInstall(Application application, Long retainedDelayMillis) {
+    /*
+     * 目前初始化采用的方案是在Application中显式的调用GlobalObserver.manuallyInstall()方法
+     * */
+    public static void manuallyInstall(Application application) {
         // Todo 需要在这个地方创建InternalLeakGuardian的单实例，并进行必要的初始化工作
+        InternalLeakGuardian.getInstance().init(application, objectObserver);
         checkNotNull(objectObserver);
         List<InsatllableObserver> observersForInstall = appDefaultObservers(application, objectObserver);
         for (InsatllableObserver insatllableObserver : observersForInstall) {
