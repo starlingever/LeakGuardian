@@ -10,6 +10,7 @@ package com.starlingever.objectobserver;
 
 
 import android.app.Application;
+import android.content.res.AssetManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 
@@ -25,7 +26,7 @@ import com.starlingever.objectobserver.analyzer.LeakGuardianHeapDumpListener;
 public class InternalLeakGuardian implements OnObjectRetainedListener {
     private HeapDumpTrigger heapDumpTrigger;
 
-    private Application application;
+    public Application application;
 
     private static final String LEAK_GUARDIAN_THREAD_NAME = "LeakGuardianThread";
 

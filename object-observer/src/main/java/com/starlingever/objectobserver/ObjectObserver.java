@@ -11,15 +11,23 @@ package com.starlingever.objectobserver;
 import static androidx.core.util.Preconditions.checkNotNull;
 
 import android.annotation.SuppressLint;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.starlingever.objectobserver.utils.GlobalData;
 
 import java.lang.ref.ReferenceQueue;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Executor;
+
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+
+import leakcanary.Clock;
+import leakcanary.KeyedWeakReference;
 
 
 public class ObjectObserver implements ReachabilityObserver {
@@ -30,11 +38,12 @@ public class ObjectObserver implements ReachabilityObserver {
 
     private GcTrigger gcTrigger = GcTrigger.DEFAULT;
 
-    private int retainedObjectNum;
 
     private final ReferenceQueue<Object> queue = new ReferenceQueue<>();
 
     private final Set<String> observedObjectKeys = new CopyOnWriteArraySet<>();
+
+    private final Map<String, KeyedWeakReference> observedObjects = new HashMap<String, KeyedWeakReference>();
 
     private final Set<OnObjectRetainedListener> onObjectRetainedListeners = new CopyOnWriteArraySet<>();
 
@@ -45,9 +54,14 @@ public class ObjectObserver implements ReachabilityObserver {
         this.isEnabled = isEnabled;
     }
 
-    public int getRetainedObjectNum() {
-        removeWeaklyReachableReferences();
-        return observedObjectKeys.size();
+//    public int getRetainedObjectNum() {
+//        removeWeaklyReachableReferences();
+//        return observedObjectKeys.size();
+//    }
+
+    public int getRetainedObjectNumMap() {
+        removeMapWeaklyReachable();
+        return observedObjects.size();
     }
 
     public void observe(Object observedObject) {
@@ -61,31 +75,63 @@ public class ObjectObserver implements ReachabilityObserver {
         checkNotNull(description, "对象名称");
         // final long observeStartNanoTime = System.nanoTime();
         String key = UUID.randomUUID().toString();
-        observedObjectKeys.add(key);
-        final KeyedWeakReference keyedWeakReference = new KeyedWeakReference(observedObject, queue, key, description);
-        checkRetainedExecutor.execute(() -> moveToRetained(keyedWeakReference));
+//        observedObjectKeys.add(key);
+        long observedTime = NANOSECONDS.toMillis(System.nanoTime());
+        Log.d(GlobalData.OBS, "正在监控对象，时间为" + observedTime);
+//        final KeyedWeakReference keyedWeakReference = new KeyedWeakReference(observedObject, queue, key, description);
+        KeyedWeakReference keyedWeakReferenceHelper = new KeyedWeakReference(observedObject, key, description, observedTime, queue);
+        observedObjects.put(key, keyedWeakReferenceHelper);
+        checkRetainedExecutor.execute(() -> moveToRetained(key));
     }
 
-    private void moveToRetained(KeyedWeakReference reference) {
-        removeWeaklyReachableReferences();
+    /*
+     * 针对于Set类型的泄漏监控
+     * */
+//    private void moveToRetained(KeyedWeakReference reference) {
+//        removeWeaklyReachableReferences();
+//        // 显式的调用gc以增加准确率，也可以不调用
+//        // gcTrigger.runGc();
+//        if (exist(reference)) {
+//            Log.d(GlobalData.OBS, "监控到泄漏对象存在!");
+//            for (OnObjectRetainedListener onObjectRetainedListener : onObjectRetainedListeners) {
+//                onObjectRetainedListener.onObjectRetained();
+//            }
+//        }
+//    }
+
+    /*
+     * 针对于Map类型的泄漏监控
+     * */
+    private void moveToRetained(String key) {
+        removeMapWeaklyReachable();
         // 显式的调用gc以增加准确率，也可以不调用
         // gcTrigger.runGc();
-        if (exist(reference)) {
-            Log.d(GlobalData.OBS, "监控到泄漏对象存在!");
+
+        if (observedObjects.get(key) != null) {
+            long observedTime = NANOSECONDS.toMillis(System.nanoTime());
+            Log.d(GlobalData.OBS, "监控到泄漏对象存在!时间为" + observedTime);
+            observedObjects.get(key).setRetainedUptimeMillis(observedTime);
             for (OnObjectRetainedListener onObjectRetainedListener : onObjectRetainedListeners) {
                 onObjectRetainedListener.onObjectRetained();
             }
         }
     }
 
-    private boolean exist(KeyedWeakReference reference) {
-        return observedObjectKeys.contains(reference.key);
-    }
+//    private boolean exist(KeyedWeakReference reference) {
+//        return observedObjectKeys.contains(reference.key);
+//    }
+//
+//    private void removeWeaklyReachableReferences() {
+//        KeyedWeakReference ref;
+//        while ((ref = (KeyedWeakReference) queue.poll()) != null) {
+//            observedObjectKeys.remove(ref.key);
+//        }
+//    }
 
-    private void removeWeaklyReachableReferences() {
+    private void removeMapWeaklyReachable() {
         KeyedWeakReference ref;
         while ((ref = (KeyedWeakReference) queue.poll()) != null) {
-            observedObjectKeys.remove(ref.key);
+            observedObjects.remove(ref.getKey());
         }
     }
 
@@ -95,5 +141,11 @@ public class ObjectObserver implements ReachabilityObserver {
 
     public synchronized void removeOnObjectRetainedListener(OnObjectRetainedListener listener) {
         onObjectRetainedListeners.remove(listener);
+    }
+
+    public void clearObservedBefore() {
+        int size = observedObjectKeys.size();
+        Log.d(GlobalData.DUMP, "key集合中仍存在的对象个数为" + size);
+        // ToDo
     }
 }

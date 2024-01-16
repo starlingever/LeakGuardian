@@ -10,8 +10,9 @@ package com.starlingever.objectobserver;
 
 
 import java.io.File;
+import java.io.Serializable;
 
-public class HeapDump {
+public class HeapDump implements Serializable {
 
 
     public interface Listener {
@@ -27,13 +28,10 @@ public class HeapDump {
 
     public final File heapDumpFile;
 
-    public final String referKey;
+    private final String uniqueId;
 
-    public final String referName;
-
-    public HeapDump(File heapDumpFile, String referKey, String referName) {
+    public HeapDump(File heapDumpFile, String uniqueId) {
         this.heapDumpFile = heapDumpFile;
-        this.referKey = referKey;
-        this.referName = referName;
+        this.uniqueId = uniqueId;
     }
 }

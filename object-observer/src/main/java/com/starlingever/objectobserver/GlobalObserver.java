@@ -14,6 +14,7 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +36,7 @@ public class GlobalObserver {
      * 目前初始化采用的方案是在Application中显式的调用GlobalObserver.manuallyInstall()方法
      * */
     public static void manuallyInstall(Application application) {
+        Toast.makeText(application, "正在初始化LeakGuardian", Toast.LENGTH_SHORT).show();
         // Todo 需要在这个地方创建InternalLeakGuardian的单实例，并进行必要的初始化工作
         InternalLeakGuardian.getInstance().init(application, objectObserver);
         checkNotNull(objectObserver);

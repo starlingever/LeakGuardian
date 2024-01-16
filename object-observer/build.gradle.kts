@@ -1,5 +1,6 @@
 plugins {
     id("com.android.library")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
@@ -26,6 +27,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
 }
 
 dependencies {
@@ -33,7 +37,12 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.9.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.core:core-ktx:+")
+    implementation("androidx.core:core-ktx:+")
     testImplementation("junit:junit:4.13.2")
+//    debugImplementation ("com.squareup.leakcanary:leakcanary-android:1.6.3")
+    debugImplementation ("com.squareup.leakcanary:shark-android:2.12")
+    debugImplementation ("com.squareup.leakcanary:leakcanary-android:3.0-alpha-1")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }

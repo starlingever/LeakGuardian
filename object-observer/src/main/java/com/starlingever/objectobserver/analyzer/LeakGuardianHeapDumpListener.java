@@ -10,8 +10,10 @@ package com.starlingever.objectobserver.analyzer;
 
 
 import android.content.Context;
+import android.util.Log;
 
 import com.starlingever.objectobserver.HeapDump;
+import com.starlingever.objectobserver.utils.GlobalData;
 
 public final class LeakGuardianHeapDumpListener implements HeapDump.Listener {
     private final Context context;
@@ -23,7 +25,9 @@ public final class LeakGuardianHeapDumpListener implements HeapDump.Listener {
 
     @Override
     public void analyze(HeapDump heapDump) {
+        Log.d(GlobalData.ANAL,"正在进行引用链分析...");
         // Todo 具体的分析逻辑
+        Log.d(GlobalData.ANAL,"当前线程为" + Thread.currentThread());
         HeapAnalyzerService.runAnalysis(context, heapDump);
     }
 }

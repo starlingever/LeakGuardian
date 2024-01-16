@@ -4,12 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LeakActivityDemo">
-
+    tools:context=".LeakActivityDemo2">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="此Activity销毁后可能会泄漏"
+        android:text="此Activity销毁后不会泄漏"
         android:textColor="@color/cardview_shadow_start_color"
         android:textSize="25sp"
         app:layout_constraintBottom_toBottomOf="parent"

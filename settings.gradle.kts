@@ -17,4 +17,3 @@ rootProject.name = "LeakGuardian"
 include(":app")
 include(":object-observer")
 include(":leakguardian-core")
-include(":trace-hunter")

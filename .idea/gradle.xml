@@ -12,7 +12,6 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/leakguardian-core" />
             <option value="$PROJECT_DIR$/object-observer" />
-            <option value="$PROJECT_DIR$/trace-hunter" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

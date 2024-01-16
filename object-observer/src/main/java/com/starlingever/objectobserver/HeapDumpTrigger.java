@@ -10,6 +10,7 @@ package com.starlingever.objectobserver;
 
 
 import android.app.Application;
+import android.content.res.AssetManager;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -18,6 +19,7 @@ import android.util.Log;
 import com.starlingever.objectobserver.utils.GlobalData;
 
 import java.io.File;
+import java.util.UUID;
 
 public final class HeapDumpTrigger implements HeapDumper {
 
@@ -62,16 +64,23 @@ public final class HeapDumpTrigger implements HeapDumper {
     }
 
     private void checkRetainedObjects() {
-        int retainedObjectNum = objectObserver.getRetainedObjectNum();
+//        int retainedObjectNum = objectObserver.getRetainedObjectNum();
+        int retainedObjectNum = objectObserver.getRetainedObjectNumMap();
         Log.d(GlobalData.DUMP, "有" + retainedObjectNum + "个泄漏对象");
         if (retainedObjectNum >= threshold) {
             Log.d(GlobalData.DUMP, "可以进行heapDump");
             File heapDumpFile = dumpHeap();
+            // 清除已经被检测的对象key
+            objectObserver.clearObservedBefore();
             assert heapDumpFile != null;
             long length = heapDumpFile.length();
+            if (length == 0L) {
+                throw new RuntimeException("Heap堆的大小为0！");
+            }
             Log.d(GlobalData.DUMP, "转存堆快照大小为" + length + "字节");
             // Todo 另起一个独立进程进行heapDumpFile的分析，以后台服务的形式
-            HeapDump heapDump = new HeapDump(heapDumpFile, "", "");
+            String currentEventUniqueId = UUID.randomUUID().toString();
+            HeapDump heapDump = new HeapDump(heapDumpFile, currentEventUniqueId);
             heapDumpListener.analyze(heapDump);
         }
 
