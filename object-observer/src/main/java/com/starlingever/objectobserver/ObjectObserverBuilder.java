@@ -8,6 +8,9 @@
  */
 package com.starlingever.objectobserver;
 
-
+/*
+ * ObjectObserver的建造器，支持自定义对象
+ * */
 public class ObjectObserverBuilder {
+
 }

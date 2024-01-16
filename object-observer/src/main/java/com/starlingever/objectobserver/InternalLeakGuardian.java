@@ -10,9 +10,9 @@ package com.starlingever.objectobserver;
 
 
 import android.app.Application;
-import android.content.res.AssetManager;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.widget.Toast;
 
 import com.starlingever.objectobserver.analyzer.LeakGuardianHeapDumpListener;
 
@@ -53,6 +53,7 @@ public class InternalLeakGuardian implements OnObjectRetainedListener {
     }
 
     private void scheduleRetainedObjectCheck() {
+        Toast.makeText(application,"有内存发生泄漏!",Toast.LENGTH_SHORT).show();
         if (heapDumpTrigger != null) {
             heapDumpTrigger.scheduleHandlePossibleRetainedObject(0L);
         } else {

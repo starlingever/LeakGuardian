@@ -11,8 +11,8 @@ package com.starlingever.objectobserver;
 import static androidx.core.util.Preconditions.checkNotNull;
 
 import android.annotation.SuppressLint;
-import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.starlingever.objectobserver.utils.GlobalData;
 
@@ -26,7 +26,6 @@ import java.util.concurrent.Executor;
 
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
-import leakcanary.Clock;
 import leakcanary.KeyedWeakReference;
 
 
@@ -75,10 +74,10 @@ public class ObjectObserver implements ReachabilityObserver {
         checkNotNull(description, "对象名称");
         // final long observeStartNanoTime = System.nanoTime();
         String key = UUID.randomUUID().toString();
-//        observedObjectKeys.add(key);
+        // observedObjectKeys.add(key);
         long observedTime = NANOSECONDS.toMillis(System.nanoTime());
         Log.d(GlobalData.OBS, "正在监控对象，时间为" + observedTime);
-//        final KeyedWeakReference keyedWeakReference = new KeyedWeakReference(observedObject, queue, key, description);
+        // final KeyedWeakReference keyedWeakReference = new KeyedWeakReference(observedObject, queue, key, description);
         KeyedWeakReference keyedWeakReferenceHelper = new KeyedWeakReference(observedObject, key, description, observedTime, queue);
         observedObjects.put(key, keyedWeakReferenceHelper);
         checkRetainedExecutor.execute(() -> moveToRetained(key));
@@ -103,10 +102,9 @@ public class ObjectObserver implements ReachabilityObserver {
      * 针对于Map类型的泄漏监控
      * */
     private void moveToRetained(String key) {
-        removeMapWeaklyReachable();
         // 显式的调用gc以增加准确率，也可以不调用
-        // gcTrigger.runGc();
-
+        gcTrigger.runGc();
+        removeMapWeaklyReachable();
         if (observedObjects.get(key) != null) {
             long observedTime = NANOSECONDS.toMillis(System.nanoTime());
             Log.d(GlobalData.OBS, "监控到泄漏对象存在!时间为" + observedTime);
@@ -117,9 +115,9 @@ public class ObjectObserver implements ReachabilityObserver {
         }
     }
 
-//    private boolean exist(KeyedWeakReference reference) {
-//        return observedObjectKeys.contains(reference.key);
-//    }
+    private boolean exist(KeyedWeakReference reference) {
+        return observedObjects.containsKey(reference.getKey());
+    }
 //
 //    private void removeWeaklyReachableReferences() {
 //        KeyedWeakReference ref;

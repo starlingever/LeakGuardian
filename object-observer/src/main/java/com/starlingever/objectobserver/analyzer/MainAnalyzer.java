@@ -66,7 +66,7 @@ public class MainAnalyzer {
     private HeapAnalyzer heapAnalyzer = new HeapAnalyzer(new OnAnalysisProgressListener() {
         @Override
         public void onAnalysisProgress(@NonNull Step step) {
-            // 这里暂时没有重写的逻辑
+            // 这里暂时没有重写的逻辑，传入空进度感知机
         }
     });
 

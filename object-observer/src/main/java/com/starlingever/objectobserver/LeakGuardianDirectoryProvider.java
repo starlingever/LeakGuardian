@@ -9,8 +9,6 @@
 package com.starlingever.objectobserver;
 
 
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
 import android.content.Context;

@@ -14,6 +14,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     Button buttonLeakActivity;
     Button buttonNoLeakActivity;
+    Button buttonAbout;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -28,8 +29,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        });
         buttonLeakActivity = findViewById(R.id.button_leak_activity);
         buttonNoLeakActivity = findViewById(R.id.button_no_leak_activity);
+        buttonAbout = findViewById(R.id.about);
         buttonLeakActivity.setOnClickListener(this);
         buttonNoLeakActivity.setOnClickListener(this);
+        buttonAbout.setOnClickListener(this);
     }
 
     @Override
@@ -54,6 +57,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     showToast("当前页面不会泄漏");
                 }
             });
+        } else if (v == buttonAbout) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("关于"); // 设置对话框标题
+            builder.setMessage("LeakGuardian能够检测内存泄漏，自动转储堆快照，并最终进行泄漏对象的引用链分析，输出分析报告");
+            builder.setPositiveButton("确定", (dialog, which) -> {
+                dialog.dismiss();
+            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
         }
     }
 

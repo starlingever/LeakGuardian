@@ -9,19 +9,28 @@
 package com.starlingever.objectobserver;
 
 
+import android.annotation.SuppressLint;
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.Service;
+import android.content.Context;
 import android.content.res.AssetManager;
+import android.os.Build;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.util.Log;
 
 import com.starlingever.objectobserver.utils.GlobalData;
+import com.starlingever.objectobserver.utils.Notifications;
 
 import java.io.File;
 import java.util.UUID;
 
 public final class HeapDumpTrigger implements HeapDumper {
+    private NotificationManager notificationManager;
 
     private final int threshold = 1;
 
@@ -68,7 +77,8 @@ public final class HeapDumpTrigger implements HeapDumper {
         int retainedObjectNum = objectObserver.getRetainedObjectNumMap();
         Log.d(GlobalData.DUMP, "有" + retainedObjectNum + "个泄漏对象");
         if (retainedObjectNum >= threshold) {
-            Log.d(GlobalData.DUMP, "可以进行heapDump");
+            showNotification(retainedObjectNum, "正在进行堆快照转储并分析...");
+            Log.d(GlobalData.DUMP, "正在进行堆快照转储并分析...");
             File heapDumpFile = dumpHeap();
             // 清除已经被检测的对象key
             objectObserver.clearObservedBefore();
@@ -85,6 +95,25 @@ public final class HeapDumpTrigger implements HeapDumper {
         }
 
 
+    }
+
+    private void showNotification(int objectCount, String contentText) {
+        if (!Notifications.canShowNotification) {
+            return;
+        }
+        notificationManager = (NotificationManager) application.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel("notification", "通知", NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+        String title = objectCount + "个泄漏对象被检测到!";
+        @SuppressLint({"NewApi", "LocalSuppress"}) Notification.Builder builder = new Notification.Builder(application, "notification");
+        builder.setContentTitle(title)
+                .setContentText(contentText)
+                .setAutoCancel(true)
+                .setSmallIcon(R.drawable.ic_launcher_foreground);
+        Notification notification = builder.build();
+        notificationManager.notify(1, notification);
     }
 
     @Override

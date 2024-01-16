@@ -37,7 +37,6 @@ public class GlobalObserver {
      * */
     public static void manuallyInstall(Application application) {
         Toast.makeText(application, "正在初始化LeakGuardian", Toast.LENGTH_SHORT).show();
-        // Todo 需要在这个地方创建InternalLeakGuardian的单实例，并进行必要的初始化工作
         InternalLeakGuardian.getInstance().init(application, objectObserver);
         checkNotNull(objectObserver);
         List<InsatllableObserver> observersForInstall = appDefaultObservers(application, objectObserver);
