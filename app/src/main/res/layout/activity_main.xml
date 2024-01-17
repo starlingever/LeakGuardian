@@ -1,27 +1,72 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
     android:orientation="vertical"
     android:gravity="center">
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="这是一个测试内存泄漏SDK功能的demo，你可以点击进入一些可能会发生内存泄漏的页面，或者点击生成一些可能会内存泄漏的组件，以测试该SDK的正常功能。当内存泄漏发生时，该SDK会在5秒内响应，并在随后的30秒内分析出泄漏对象的引用链，以帮助开发人员更快速准确的定位内存泄漏来源，提高开发效率和安全性。"
+        android:layout_margin="25dp"
+        android:textStyle="bold"
+        android:textSize="18sp"/>
     <Button
         android:id="@+id/button_leak_activity"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:text="可能泄漏的Activity A"
-        tools:ignore="HardcodedText"
+        android:text="可能泄漏的Activity"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#D8D8D8"
         android:layout_marginBottom="15dp"/>
 
     <Button
         android:id="@+id/button_no_leak_activity"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:text="正常的Activity B"
-        tools:ignore="HardcodedText"
+        android:text="正常的Activity"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#D8D8D8"
+        android:layout_marginBottom="15dp"/>
+
+    <Button
+        android:id="@+id/service"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="可能泄漏的Service"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#D8D8D8"
+        android:layout_marginBottom="15dp"/>
+
+    <Button
+        android:id="@+id/fragment1"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:text="可能泄漏的fragment"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#D8D8D8"
         android:layout_marginBottom="15dp"/>
 
     <Button
@@ -29,5 +74,6 @@
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:text="关于"
-        tools:ignore="HardcodedText" />
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/button_background"/>
 </LinearLayout>

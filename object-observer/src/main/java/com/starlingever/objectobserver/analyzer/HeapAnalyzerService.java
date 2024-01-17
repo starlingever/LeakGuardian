@@ -9,8 +9,15 @@
 package com.starlingever.objectobserver.analyzer;
 
 
+import android.annotation.SuppressLint;
+import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -18,10 +25,15 @@ import android.util.Log;
 import androidx.core.content.ContextCompat;
 
 import com.starlingever.objectobserver.HeapDump;
+import com.starlingever.objectobserver.R;
+import com.starlingever.objectobserver.activities.AnalysisActivity;
 import com.starlingever.objectobserver.utils.GlobalData;
+import com.starlingever.objectobserver.utils.Notifications;
 
 import java.io.IOException;
 import java.text.ParseException;
+
+import shark.HeapAnalysis;
 
 
 public class HeapAnalyzerService extends ForegroundService {
@@ -46,7 +58,9 @@ public class HeapAnalyzerService extends ForegroundService {
                 Log.d(GlobalData.ANAL, "马上准备在后台线程进行堆分析！当前线程为" + Thread.currentThread());
                 MainAnalyzer mainAnalyzer = MainAnalyzer.getInstance();
                 try {
-                    mainAnalyzer.runAnalysis(heapDump);
+                    HeapAnalysis heapAnalysis = mainAnalyzer.runAnalysis(heapDump);
+                    String content = "点击查看分析报告!";
+                    showAnalysisDoneNotification(context, content, heapAnalysis);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (ParseException e) {
@@ -54,6 +68,30 @@ public class HeapAnalyzerService extends ForegroundService {
                 }
             }
         });
+    }
+
+    private static void showAnalysisDoneNotification(Context context, String content, HeapAnalysis heapAnalysis) {
+        if (!Notifications.canShowNotification) {
+            return;
+        }
+        NotificationManager notificationManager = Notifications.getNotificationManager((Application) context);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel("notification", "通知", NotificationManager.IMPORTANCE_HIGH);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+        double sec = (heapAnalysis.getAnalysisDurationMillis()) / 1000.0;
+        String title = "引用链分析完成,本次用时" + sec + "秒";
+        Intent intent = new Intent(context, AnalysisActivity.class);
+        intent.putExtra("analysis", heapAnalysis);
+        PendingIntent pd = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_MUTABLE);
+        @SuppressLint({"NewApi", "LocalSuppress"}) Notification.Builder builder = new Notification.Builder(context, "notification");
+        builder.setContentTitle(title)
+                .setContentText(content)
+                .setAutoCancel(false)
+                .setContentIntent(pd)
+                .setSmallIcon(R.drawable.ic_launcher_foreground);
+        Notification notification = builder.build();
+        notificationManager.notify(1, notification);
     }
 
     @Override

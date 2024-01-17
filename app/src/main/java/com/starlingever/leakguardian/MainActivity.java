@@ -15,6 +15,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     Button buttonLeakActivity;
     Button buttonNoLeakActivity;
     Button buttonAbout;
+    Button buttonLeakService;
+    Button buttonLeakFragment;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -30,9 +32,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonLeakActivity = findViewById(R.id.button_leak_activity);
         buttonNoLeakActivity = findViewById(R.id.button_no_leak_activity);
         buttonAbout = findViewById(R.id.about);
+        buttonLeakService = findViewById(R.id.service);
+        buttonLeakFragment = findViewById(R.id.fragment1);
+
         buttonLeakActivity.setOnClickListener(this);
         buttonNoLeakActivity.setOnClickListener(this);
         buttonAbout.setOnClickListener(this);
+        buttonLeakService.setOnClickListener(this);
+        buttonLeakFragment.setOnClickListener(this);
     }
 
     @Override
@@ -61,6 +68,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
             builder.setTitle("关于"); // 设置对话框标题
             builder.setMessage("LeakGuardian能够检测内存泄漏，自动转储堆快照，并最终进行泄漏对象的引用链分析，输出分析报告");
+            builder.setPositiveButton("确定", (dialog, which) -> {
+                dialog.dismiss();
+            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        } else if (v == buttonLeakService) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("SERVICE"); // 设置对话框标题
+            builder.setMessage("请继续关注后续的版本~");
+            builder.setPositiveButton("确定", (dialog, which) -> {
+                dialog.dismiss();
+            });
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        } else if (v == buttonLeakFragment) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+            builder.setTitle("FRAGMENT"); // 设置对话框标题
+            builder.setMessage("请继续关注后续的版本");
             builder.setPositiveButton("确定", (dialog, which) -> {
                 dialog.dismiss();
             });

@@ -30,7 +30,6 @@ import java.io.File;
 import java.util.UUID;
 
 public final class HeapDumpTrigger implements HeapDumper {
-    private NotificationManager notificationManager;
 
     private final int threshold = 1;
 
@@ -101,7 +100,8 @@ public final class HeapDumpTrigger implements HeapDumper {
         if (!Notifications.canShowNotification) {
             return;
         }
-        notificationManager = (NotificationManager) application.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager = Notifications.getNotificationManager(application);
+//        notificationManager = (NotificationManager) application.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel("notification", "通知", NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(notificationChannel);
@@ -111,6 +111,7 @@ public final class HeapDumpTrigger implements HeapDumper {
         builder.setContentTitle(title)
                 .setContentText(contentText)
                 .setAutoCancel(true)
+                .setProgress(0, 0, true)
                 .setSmallIcon(R.drawable.ic_launcher_foreground);
         Notification notification = builder.build();
         notificationManager.notify(1, notification);
