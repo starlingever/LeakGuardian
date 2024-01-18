@@ -23,12 +23,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        @SuppressLint({"MissingInflatedId", "LocalSuppress"}) Button button = (Button) findViewById(R.id.testButton);
-//        button.setOnClickListener(v -> {
-//            Intent intent = new Intent();
-//            intent.setClass(MainActivity.this,LeakActivityDemo.class);
-//            startActivity(intent);
-//        });
         buttonLeakActivity = findViewById(R.id.button_leak_activity);
         buttonNoLeakActivity = findViewById(R.id.button_no_leak_activity);
         buttonAbout = findViewById(R.id.about);

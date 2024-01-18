@@ -108,7 +108,6 @@ public class HeapAnalyzerService extends ForegroundService {
         MainAnalyzer mainAnalyzer = MainAnalyzer.getInstance();
         assert heapDump != null;
         Log.d(GlobalData.ANAL, "马上准备在后台线程进行堆分析！当前线程为" + Thread.currentThread());
-//        mainAnalyzer.runAnalysis(heapDump);
 
 
     }

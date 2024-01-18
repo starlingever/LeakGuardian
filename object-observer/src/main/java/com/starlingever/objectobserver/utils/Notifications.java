@@ -21,13 +21,9 @@ import com.starlingever.objectobserver.R;
 
 public class Notifications {
 
-    private boolean notificationPermissionRequested = false;
-
     public static boolean canShowNotification = true;
 
     private static NotificationManager notificationManager;
-
-    private static Notifications notifications;
 
     public static NotificationManager getNotificationManager(Application application) {
         if (notificationManager == null) {

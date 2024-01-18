@@ -21,12 +21,6 @@ public abstract class ForegroundService extends IntentService {
         super.onCreate();
     }
 
-    /**
-     * Creates an IntentService.  Invoked by your subclass's constructor.
-     *
-     * @param name              Used to name the worker thread, important only for debugging.
-     * @param analyzingHeapDump
-     */
     public ForegroundService(String name, String analyzingHeapDump) {
         super(name);
     }

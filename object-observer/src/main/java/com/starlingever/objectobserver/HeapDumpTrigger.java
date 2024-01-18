@@ -101,7 +101,6 @@ public final class HeapDumpTrigger implements HeapDumper {
             return;
         }
         NotificationManager notificationManager = Notifications.getNotificationManager(application);
-//        notificationManager = (NotificationManager) application.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel notificationChannel = new NotificationChannel("notification", "通知", NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(notificationChannel);

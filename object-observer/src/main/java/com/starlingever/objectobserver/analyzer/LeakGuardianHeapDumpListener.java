@@ -25,9 +25,8 @@ public final class LeakGuardianHeapDumpListener implements HeapDump.Listener {
 
     @Override
     public void analyze(HeapDump heapDump) {
-        Log.d(GlobalData.ANAL,"正在进行引用链分析...");
-        // Todo 具体的分析逻辑
-        Log.d(GlobalData.ANAL,"当前线程为" + Thread.currentThread());
+        Log.d(GlobalData.ANAL, "正在进行引用链分析...");
+        Log.d(GlobalData.ANAL, "当前线程为" + Thread.currentThread());
         HeapAnalyzerService.runAnalysis(context, heapDump);
     }
 }
